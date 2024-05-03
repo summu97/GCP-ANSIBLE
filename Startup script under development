@@ -1,0 +1,31 @@
+------------------
+# Setting Host-name:
+hostnamectl set-hostname master
+sudo -i
+
+# Changing Configurations:
+sed -i '34  PermitRootLogin yes' /root/etc/ssh/sshd_config
+sed -i '58  PasswordAuthentication yes' /root/etc/ssh/sshd_config
+systemctl restart sshd
+
+# Setting password:
+passwd root
+
+# Installing ansible:
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+ansible --version
+----------------
+# Setting Host-name:
+hostnamectl set-hostname worker-1
+sudo -i
+
+# Changing Configurations:
+sed -i '34  PermitRootLogin yes' /root/etc/ssh/sshd_config
+sed -i '58  PasswordAuthentication yes' /root/etc/ssh/sshd_config
+systemctl restart sshd
+
+# Setting password:
+passwd root
