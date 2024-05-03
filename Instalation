@@ -1,0 +1,107 @@
+SETUP: CREATE 5 SERVERS [1=ANSIBLE, 2=DEV, 2=TEST]
+ 
+IN ALL SERVERS: Set hostnames, Set Password:(Do it in all hosts)
+
+sudo -i
+
+hostnamectl set-hostname YOUR_DESIRED_NAME_FOR_EACH_HOST
+
+sudo -i
+
+passwd root #set password for each host
+ 
+IN ALL SERVERS: Giving desired permissions:(Do it in all hosts)
+
+vim /etc/ssh/sshd_config
+
+Line: 34: change to--> PermitRootLogin yes
+Line:59: PasswordAuthentication no: Change 'no to yes'
+
+systemctl restart sshd
+
+systemctl status sshd
+
+hostname -i # you will get private ip
+
+
+								:ANSIBLE INSTALLATION:
+ 
+IN ANSIBLE SERVER:
+FOR UBUNTU:
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+ansible --version
+
+SETTING UP INVENTORY:
+
+vim /etc/ansible/hosts # give private ip of worker nodes as follows or your desired way
+
+[dev]
+
+172.31.20.40
+
+172.31.21.25
+
+[test]
+
+172.31.31.77
+
+172.31.22.114
+
+
+ 
+SETTING UP CONNECTION:
+
+ssh-keygen
+
+ssh-copy-id root@private ip of dev-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of dev-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of test-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of test-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+ 
+CONFIRM USING THIS COMMAND:
+
+ansible -m ping all
+
+-------------------------------------
+FOR AMAZON LINUC:
+amazon-linux-extras install ansible2 -y # installing ansible
+
+yum install python3 python-pip python-dlevel -y #installing python dependicies
+ 
+SETTING UP INVENTORY:
+
+vim /etc/ansible/hosts # give private ip of worker nodes as follows or your desired way
+
+[dev]
+
+172.31.20.40
+
+172.31.21.25
+
+[test]
+
+172.31.31.77
+
+172.31.22.114
+ 
+SETTING UP CONNECTION:
+
+ssh-keygen
+
+ssh-copy-id root@private ip of dev-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of dev-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of test-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+ssh-copy-id root@private ip of test-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+ 
+CONFIRM USING THIS COMMAND:
+
+ansible -m ping all
