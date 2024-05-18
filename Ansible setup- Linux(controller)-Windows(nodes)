@@ -1,1 +1,105 @@
+* Use Ansible to Manage Windows Servers via (SSH | port 22)
+* Linux(controller) & Windows(nodes):
 
+--> Create one VM with ubuntu as OS and nodes with windows as OS:
+
+* In Windows(nodes):
+
+-->Connect to windows VM:
+-->Settings-->Network & Internet-->Windows Firewall-->Advanced settings-->Windows Defender Firewall with advanced security-->Inbound-->file & printer sharing ICMPv4-->click on it-->enable rule
+
+-->Open powershell as administrator and run below commands:
+======================================
+dism /Online /Add-Capability /CapabilityName:OpenSSH.Server~~~~0.0.1.0
+Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
+Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+
+if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
+    Write-Output "Firewall Rule 'OpenSSH-Server-In-TCP' does not exist, creating it..."
+    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+} else {
+    Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
+}
+======================================
+* In Linux(controller):
+-->Create Ubuntu Vm and Connect to it & become sudo user & below commands:
+sudo -i
+apt-get update
+apt-get install ansible -y
+ansible --version
+sudo apt-get install sshpass
+
+======================================
+vim sumo.in(Inventory file)
+-----
+[win]
+PUBLIC IP_ADDRESS OF SLAVE NODE
+
+[win:vars]
+ansible_user=Administrator
+ansible_password="PASSWORD YOU GENERATED"
+ansible_connection=ssh
+ansible_shell_type=cmd
+ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+ansible_ssh_retries=3
+ansible_become_method=runas
+-----
+EX:
+[win]
+13.235.99.166
+
+[win:vars]
+ansible_user=Administrator
+ansible_password="z3qctr8F!DUt.Sy)P9(ync@AXB4hGE3y"
+ansible_connection=ssh
+ansible_shell_type=cmd
+ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+ansible_ssh_retries=3
+ansible_become_method=runas
+-----
+To check connectivity: ansible win -i sumo.in -m win_ping
+======================================
+Sample Playbook:
+
+vim sumo.yml
+-----
+- hosts: win
+  gather_facts: no
+  tasks:
+    - name: test powershell
+      win_shell: |
+                get-host
+      register: result_get_host
+
+    - name: display result_get_host
+      debug:
+        var: result_get_host
+-----
+Installation of  Apache using playbook:
+
+- hosts: win
+  gather_facts: no
+  tasks:
+
+    - name: add directory
+      win_file:
+        path: C:\ansible_examples
+        state: directory
+
+    - name: Download the Apache installer
+      win_get_url:
+        url: https://archive.apache.org/dist/httpd/binaries/win32/httpd-2.2.25-win32-x86-no_ssl.msi 
+
+        dest: C:\ansible_examples\httpd-2.2.25-win32-x86-no_ssl.msi
+        force: true
+
+    - name: Install MSI
+      win_package:
+        path: C:\ansible_examples\httpd-2.2.25-win32-x86-no_ssl.msi
+        state: present
+-----
+
+To run playbook: ansible -i sumo.in win sumo.yml
+======================================
