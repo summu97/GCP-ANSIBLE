@@ -1,7 +1,50 @@
-STEP1: Installing wsl(w) in local powershell terminal
+Windows(controller) & Windows(nodes)
 
-PowerShell commands (AWS specific but you can adjust to your own requirements):
+Windows(controller):
+Setting local machine as master node:
+Open powershell and run below commands:
 
+To chesk wsl version: wsl --version
+To check wsl distributions available: wsl --list --online
+To install specific wsl version: wsl --install -d Ubuntu
+				Enter new UNIX username:
+				Enter password:
+				Re-enter password:
+				(you will be inside wsl)
+To logout: exit
+To go into wsl: wsl -d Ubuntu
+Once you enter into wsl:
+sudo -i-->Give password that you set earlier.
+Update: apt-get update
+Install Ansible: apt-get install ansible -y
+================================
+NOTE: Pre-requesites.
+Powershell: 3.0+ version
+.NET: 4.0+ version
+--------------------------------
+* To check ther version of "powershell":
+Get-Host | Select-Object Version
+		(or)
+$PSVersionTable.PSVersion
+
+* To check the ".NET" version:
+Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse |
+  Get-ItemProperty -Name Version -ErrorAction SilentlyContinue |
+  Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} |
+  Select-Object PSChildName, Version
+--------------------------------
+================================
+
+Windows(nodes):
+Create windows VM's with security group type:WinRM HTTPS i.e port 5986 and inbound rule from your host ip and also icmp.
+To get the windows host ip you are working on:
+$publicIP = Invoke-RestMethod -Uri "http://ipinfo.io/ip"
+$publicIP
+
+Decrypt the password and connect to windows machine.
+Select vm-->Actions-->Instance settings-->Modify instance metadata options-->IMDSv2(optional)
+Open powershell as administrator and run below commands:[PowerShell commands (AWS specific but you can adjust to your own requirements):]
+================================
 #Enable PowerShell remoting
 Enable-PSRemoting -Force
 
@@ -35,36 +78,64 @@ Restart-Service WinRM
 
 #List the WinRM listeners
 winrm enumerate winrm/config/Listener
------
-Enable-PSRemoting -Force
-Set-Service WinRM -StartupType 'Automatic'
-Set-Item -Path WSMan:\localhost\Service\Auth\Certificate -Value $true
-Set-Item -Path 'WSMan:\localhost\Service\AllowUnencrypted' -Value $true
-Set-Item -Path 'WSMan:\localhost\Service\Auth\Basic' -Value $true
-Set-Item -Path 'WSMan:\localhost\Service\Auth\CredSSP' -Value $true
-$cert = New-SelfSignedCertificate -DnsName $(Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/public-hostname) -CertStoreLocation "cert:\LocalMachine\My"
-winrm create winrm/config/Listener?Address=*+Transport=HTTPS "@{Hostname=`"$(Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/public-hostname)`";CertificateThumbprint=`"$($cert.Thumbprint)`"}"
-New-NetFirewallRule -DisplayName "Allow WinRM HTTPS" -Direction Inbound -LocalPort 5986 -Protocol TCP -Action Allow
-Set-Item WSMan:\localhost\Client\TrustedHosts -Value "*" -Force
-New-ItemProperty -Name LocalAccountTokenFilterPolicy -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -PropertyType DWord -Value 1 -Force
-Set-ExecutionPolicy Unrestricted -Force
-Restart-Service WinRM
-winrm enumerate winrm/config/Listener
------
-vim hosts.ini
+================================
+In Windows(controller):
+Open powershell as administrator: Connect to wsl and become root user.
+=====
+Writing inventory file:
+
+vim sumo.ini
 -----
 [win]
-<Public_ip>
+<Public_ip of windows VM>
 
 [win:vars]
 ansible_user=Administrator
-ansible_password="PASSWORD"
+ansible_password="Windows VM PASSWORD"
 ansible_port=5986
 ansible_connection=winrm
 ansible_winrm_scheme=https
 ansible_winrm_server_cert_validation=ignore
 ansible_winrm_kerberos_delegation=true
+-----
+EX:
+[win]
+13.201.43.136
 
-confirming connection: ansible -i hosts.ini -m win_ping
--i = inventory file
--m = module
+[win:vars]
+ansible_user=Administrator
+ansible_password="J;%RA$3$lwHTNFRa?MmQTboN)J!AVsP;"
+ansible_port=5986
+ansible_connection=winrm
+ansible_winrm_scheme=https
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true
+-----
+=====
+To check connectivity:
+ansible -i sumo.ini win -m win_ping
+
+OUTPUT:
+13.201.43.136 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+-----------------------------------
+Sample Playbook:
+
+vim sumo.yml
+-----
+- hosts: win
+  tasks:
+    - name: creating a file
+      win_file:
+        path: C:\Temp\folder
+        state: directory
+
+    - name: creating file
+      win_file:
+        path: C:\Temp\folder\sumo.txt
+        state: touch
+-----
+Running playbook: ansible-playbook -i sumo.ini sumo.yml
