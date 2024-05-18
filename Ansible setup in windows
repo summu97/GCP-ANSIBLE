@@ -1,0 +1,59 @@
+TASK:
+1. Create a user with administrative access.
+2. verify "powershell" & ".NET" version.
+3. SEtting up winRM.
+4. Configuring Ansible controller and lister nodes.
+ 
+* Create User(administrative access):
+
+
+* To check ther version of "powershell":
+Get-Host | Select-Object Version
+		(or)
+$PSVersionTable.PSVersion
+
+* To check the ".NET" version:
+Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse |
+  Get-ItemProperty -Name Version -ErrorAction SilentlyContinue |
+  Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} |
+  Select-Object PSChildName, Version
+
+* To verify "WinRM" configuration:
+-->Check WinRM Service Status: Get-Service -Name WinRM
+Output:
+Status   Name               DisplayName
+------   ----               -----------
+Running  WinRM              Windows Remote Management (WS-Management)
+
+-->Display WinRM Configuration: winrm get winrm/config
+Output:
+Config
+    MaxEnvelopeSizekb = 500
+    MaxTimeoutms = 60000
+    ...
+
+--> To view the current listeners that are running on the WinRM service: winrm enumerate winrm/config/listener 
+Output:
+Listener
+    Address = *
+    Transport = HTTP
+    Port = 5985
+    ...
+
+--> Test WinRM Connectivity: Test-WsMan -ComputerName localhost
+Output:
+wsmid
+-----
+http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd
+--------------------------------------------------------------------------------
+FROM: https://docs.ansible.com/ansible/latest/os_guide/windows_setup.html --> 
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+NOTE: Go through this link for more information about ansible setup in windows ot other:
+		 "https://docs.ansible.com/ansible/latest/os_guide/windows_setup.html"
