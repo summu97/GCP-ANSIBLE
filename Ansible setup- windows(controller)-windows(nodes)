@@ -41,8 +41,9 @@ To get the windows host ip you are working on:
 $publicIP = Invoke-RestMethod -Uri "http://ipinfo.io/ip"
 $publicIP
 
-Decrypt the password and connect to windows machine.
 Select vm-->Actions-->Instance settings-->Modify instance metadata options-->IMDSv2(optional)
+Decrypt the password and connect to windows machine.
+Settings-->Network & Internet-->Windows Firewall-->Advanced settings-->Windows Defender Firewall with advanced security-->Inbound-->file & printer sharing ICMPv4-->click on it-->enable rule
 Open powershell as administrator and run below commands:[PowerShell commands (AWS specific but you can adjust to your own requirements):]
 ================================
 #Enable PowerShell remoting
