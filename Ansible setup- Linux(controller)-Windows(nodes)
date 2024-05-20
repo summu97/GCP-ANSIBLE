@@ -13,6 +13,7 @@
 # Adding OpenSSH Server capability to a Windows system.
 # It is a PowerShell command used to retrieve information about Windows capabilities related to OpenSSH that are available for installation on the local system.
 # It is a PowerShell command used to install the OpenSSH Client capability on a Windows system.
+# [if-else]This PowerShell script checks for the existence of a firewall rule named "OpenSSH-Server-In-TCP" and creates it if it does not exist.
 ---------------------------------------
 dism /Online /Add-Capability /CapabilityName:OpenSSH.Server~~~~0.0.1.0
 Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
