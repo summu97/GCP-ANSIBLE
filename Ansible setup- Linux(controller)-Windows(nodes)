@@ -10,6 +10,10 @@
 
 -->Open powershell as administrator and run below commands:
 ======================================
+# Adding OpenSSH Server capability to a Windows system.
+# It is a PowerShell command used to retrieve information about Windows capabilities related to OpenSSH that are available for installation on the local system.
+# It is a PowerShell command used to install the OpenSSH Client capability on a Windows system.
+---------------------------------------
 dism /Online /Add-Capability /CapabilityName:OpenSSH.Server~~~~0.0.1.0
 Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
 Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
