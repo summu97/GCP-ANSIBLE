@@ -1,0 +1,85 @@
+* Create a vm with full-access service account or with required permissions to perform task with "UBUNTU" as "OS"
+
+* SSH to vm.
+
+* gcloud auth print-access-token-->export TOKEN="<YOUR GENERATED TOKEN>"
+
+* Run following commands:
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt-get install ansible -y
+
+* Run these commands manually:
+sudo apt-get install python3-pip -y
+pip3 install apache-libcloud
+
+
+* Generate .json key and paste in local
+
+* Run following commands:
+wget https://raw.githubusercontent.com/ansible/ansible/stable-2.8/contrib/inventory/gce.py
+wget https://raw.githubusercontent.com/ansible/ansible/stable-2.8/contrib/inventory/gce.ini
+
+* You will get gce.py and gce.ini files in local.
+
+* Change first line of gce.py to "#!/usr/bin/env python3"
+
+* Change content of gce.ini with below code:
+-----------------------------
+[gce]
+# GCE Service Account configuration information
+gce_service_account_email_address = your-service-account-email@your-project-id.iam.gserviceaccount.com # CHANGE THIS
+gce_service_account_pem_file_path = /path/to/your/service-account-key.json # CHANGE THIS
+gce_project_id = your-project-id # CHANGE THIS
+gce_zone = your-gce-zone # CHANGE THIS
+
+# Filter inventory based on state (optional)
+# instance_states = RUNNING,PROVISIONING
+
+# Filter inventory based on instance tags (optional)
+# instance_tags = http-server,https-server
+
+[inventory]
+# Specify whether 'ansible_ssh_host' should contain the instance internal or external address
+# Values: 'internal' or 'external' (optional)
+# inventory_ip_type =
+
+[cache]
+# Directory in which cache should be created
+cache_path = ~/.ansible/tmp
+
+# The number of seconds a cache file is considered valid. After this many
+# seconds, a new API call will be made, and the cache file will be updated.
+# To disable the cache, set this value to 0
+cache_max_age = 300
+-----------------------------
+sudo mv gce.py /etc/ansible/hosts
+sudo chmod +x /etc/ansible/hosts
+sudo mv gce.ini /etc/ansible 
+
+USEFUL COMMANDS:
+
+--> gcloud iam service-accounts list
+OUTPUT:
+DISPLAY NAME                            EMAIL                                               DISABLED
+full-access                             full-access@sumanth-97.iam.gserviceaccount.com      False
+Compute Engine default service account  327829741554-compute@developer.gserviceaccount.com  False
+
+-->To check current project: gcloud config get-value project
+OUTPUT:
+sumanth-97
+
+-->To see current configurations list: gcloud config configurations list
+OUTPUT:
+NAME     IS_ACTIVE  ACCOUNT             PROJECT     COMPUTE_DEFAULT_ZONE  COMPUTE_DEFAULT_REGION
+default  True       suasmame@gmail.com  sumanth-97  us-east1-b            us-east1
+
+
+
+
+
+
+
+
+
