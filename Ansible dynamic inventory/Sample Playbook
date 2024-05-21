@@ -1,0 +1,26 @@
+vim playbook.yml
+============
+- hosts: all
+  tasks:
+          - name: update package
+            command: sudo apt update
+
+          - name: install git
+            command: sudo apt install git -y
+============
+To run playbook: ansible-playbook --private-key=/home/suasmame/key.pem playbook.yml
+-----------------------------------------------------------------------------------
+OTHER WAY OF WRITING PLAYBOOK:
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: update package cache
+      apt:
+        update_cache: yes
+
+    - name: install git
+      apt:
+        name: git
+        state: present
+To run playbook: ansible-playbook --private-key=/home/suasmame/key.pem playbook.yml
