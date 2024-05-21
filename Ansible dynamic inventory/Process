@@ -58,6 +58,7 @@ sudo mv gce.py /etc/ansible/hosts
 sudo chmod +x /etc/ansible/hosts
 sudo mv gce.ini /etc/ansible 
 
+===============================================
 USEFUL COMMANDS:
 
 --> gcloud iam service-accounts list
@@ -75,7 +76,15 @@ OUTPUT:
 NAME     IS_ACTIVE  ACCOUNT             PROJECT     COMPUTE_DEFAULT_ZONE  COMPUTE_DEFAULT_REGION
 default  True       suasmame@gmail.com  sumanth-97  us-east1-b            us-east1
 
-
+-----------------------
+vim key.pem
+chmod 600 key.pem 
+eval "$(ssh-agent -s)"
+ssh-add /home/suasmame/.ssh/id_rsa
+ssh-add /home/suasmame/key.pem
+ssh-keygen -p -m PEM -f /home/suasmame/key.pem
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible all -m ping --private-key=/home/suasmame/key.pem
 
 
 
