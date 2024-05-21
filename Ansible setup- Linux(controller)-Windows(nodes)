@@ -35,7 +35,7 @@ apt-get update
 apt-get install ansible -y
 ansible --version
 sudo apt-get install sshpass
-
+NOTE: Master node must have admin priviledges i.e, create a role with adminstrative access and add it to instance.
 ======================================
 vim sumo.in(Inventory file)
 -----
