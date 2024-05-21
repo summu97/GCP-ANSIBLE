@@ -87,6 +87,12 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ansible all -m ping --private-key=/home/suasmame/key.pem
 
 
+eval "$(ssh-agent -s)"
+touch key.pem
+chmod 600 key.pem
+ssh-keygen -p -m PEM -f /home/suasmame/key.pem
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible all -m ping --private-key=/home/suasmame/key.pem
 
 
 
