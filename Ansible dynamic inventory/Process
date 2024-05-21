@@ -29,7 +29,7 @@ wget https://raw.githubusercontent.com/ansible/ansible/stable-2.8/contrib/invent
 
 * You will get gce.py and gce.ini files in local.
 
-* Change first line of gce.py to "#!/usr/bin/env python3"
+* Change first line of gce.py to "#!/usr/bin/env python3".
 
 * Change content of gce.ini with below code:
 -----------------------------
@@ -60,18 +60,20 @@ cache_path = ~/.ansible/tmp
 # To disable the cache, set this value to 0
 cache_max_age = 300
 -----------------------------
+* Run below commands one by one:
 sudo mv gce.py /etc/ansible/hosts
 sudo chmod +x /etc/ansible/hosts
 sudo mv gce.ini /etc/ansible 
 
 ===============================================
 
-* Run below commands one by one
+* Run below commands one by one:
 eval "$(ssh-agent -s)"
 ssh-keygen -p -m PEM -f /home/suasmame/key.pem
 export ANSIBLE_HOST_KEY_CHECKING=False
 ansible all -m ping --private-key=/home/suasmame/key.pem
 ===============================================
+NOTE: This method is most used for frequently changing VM instances.
 ===============================================
 USEFUL COMMANDS:
 
