@@ -1,8 +1,14 @@
+NOTE: Generate key pair and put public key in Project level Metadata: SSH keys.
+
 * Create a vm with full-access service account or with required permissions to perform task with "UBUNTU" as "OS"
 
 * SSH to vm.
 
-* gcloud auth print-access-token-->export TOKEN="<YOUR GENERATED TOKEN>"
+* Run following commands:
+touch key.pem
+Paste private key content in key.pem
+chmod 600 key.pem
+
 
 * Run following commands:
 sudo apt-get update
@@ -59,6 +65,14 @@ sudo chmod +x /etc/ansible/hosts
 sudo mv gce.ini /etc/ansible 
 
 ===============================================
+
+* Run below commands one by one
+eval "$(ssh-agent -s)"
+ssh-keygen -p -m PEM -f /home/suasmame/key.pem
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible all -m ping --private-key=/home/suasmame/key.pem
+===============================================
+===============================================
 USEFUL COMMANDS:
 
 --> gcloud iam service-accounts list
@@ -75,26 +89,6 @@ sumanth-97
 OUTPUT:
 NAME     IS_ACTIVE  ACCOUNT             PROJECT     COMPUTE_DEFAULT_ZONE  COMPUTE_DEFAULT_REGION
 default  True       suasmame@gmail.com  sumanth-97  us-east1-b            us-east1
-
------------------------
-vim key.pem
-chmod 600 key.pem 
-eval "$(ssh-agent -s)"
-ssh-add /home/suasmame/.ssh/id_rsa
-ssh-add /home/suasmame/key.pem
-ssh-keygen -p -m PEM -f /home/suasmame/key.pem
-export ANSIBLE_HOST_KEY_CHECKING=False
-ansible all -m ping --private-key=/home/suasmame/key.pem
-
-
-eval "$(ssh-agent -s)"
-touch key.pem
-chmod 600 key.pem
-ssh-keygen -p -m PEM -f /home/suasmame/key.pem
-export ANSIBLE_HOST_KEY_CHECKING=False
-ansible all -m ping --private-key=/home/suasmame/key.pem
-
-
 
 
 
