@@ -69,25 +69,27 @@ sudo mv gce.ini /etc/ansible
 
 * Run below commands one by one:
 eval "$(ssh-agent -s)"
-ssh-keygen -p -m PEM -f /home/suasmame/key.pem
+ssh-keygen -p -m PEM -f /Path/to/key.pem
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible all -m ping --private-key=/home/suasmame/key.pem
+ansible all -m ping --private-key=/Path/to/key.pem
 ===============================================
 NOTE: This method is most used for frequently changing VM instances.
 ===============================================
 USEFUL COMMANDS:
-
+* Listing service accounts:
 --> gcloud iam service-accounts list
 OUTPUT:
 DISPLAY NAME                            EMAIL                                               DISABLED
 full-access                             full-access@sumanth-97.iam.gserviceaccount.com      False
 Compute Engine default service account  327829741554-compute@developer.gserviceaccount.com  False
 
--->To check current project: gcloud config get-value project
+* To check current project:
+--> gcloud config get-value project
 OUTPUT:
 sumanth-97
 
--->To see current configurations list: gcloud config configurations list
+* To see current configurations list:
+--> gcloud config configurations list
 OUTPUT:
 NAME     IS_ACTIVE  ACCOUNT             PROJECT     COMPUTE_DEFAULT_ZONE  COMPUTE_DEFAULT_REGION
 default  True       suasmame@gmail.com  sumanth-97  us-east1-b            us-east1
