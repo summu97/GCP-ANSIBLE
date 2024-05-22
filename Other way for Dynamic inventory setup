@@ -1,0 +1,77 @@
+* Create VM with Ubuntu as OS & Login to it.
+
+* Updating packages and Installing Ansible:
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt-get install ansible -y
+
+* Installing "google-auth" Python library:
+sudo apt install python3-pip -y
+pip install google-auth
+pip install google-auth-oauthlib
+pip install google-auth-httplib2
+pip install google-api-python-client
+
+
+* Generate Service-account key, create a file and paste in it:
+vim key.json
+(Paste key here)
+
+* Inventory file:
+vim gcp.yml
+-----
+plugin: gcp_compute
+projects:
+  - project_ID
+filters: []
+auth_kind: serviceaccount
+service_account_file: /Path/to/key.json
+=====
+EX:
+plugin: gcp_compute
+projects:
+  - sumanth-97
+filters: []
+auth_kind: serviceaccount
+service_account_file: /home/suasmame/key.json
+=====
+
+* Checking if inventory is working properly:
+ansible-inventory gcp.yml --list
+
+* Adding Inventory content in ansible.cfg file:
+sudo chmod 777 /etc/ansible/ansible.cfg
+vim /etc/ansible/ansible.cfg
+(Paste below content here)
+-----
+[inventory]
+enable_plugins = gcp_compute
+
+[defaults]
+inventory = /Path/to/gcp.yml
+
+[ssh_connection]
+ssh_args = -o strictHostKeyChecking=no 
+=====
+EX:
+
+[inventory]
+enable_plugins = gcp_compute
+
+[defaults]
+inventory = /home/suasmame/gcp.yml
+
+[ssh_connection]
+ssh_args = -o strictHostKeyChecking=no
+=====
+
+sudo chmod 644 /etc/ansible/ansible.cfg
+
+* Add Private key in key.pem:
+vim key.pem
+(Paste private key content here)
+sudo chmod 600 key.pem
+
+* Checking connection:
+ansible all --private-key=/home/suasmame/key.pem -m ping
