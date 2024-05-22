@@ -65,11 +65,13 @@ sudo mv gce.py /etc/ansible/hosts
 sudo chmod +x /etc/ansible/hosts
 sudo mv gce.ini /etc/ansible 
 
+* Confirming connection:
+ansible all --list
 ===============================================
 
 * Run below commands one by one:
-eval "$(ssh-agent -s)"
-ssh-keygen -p -m PEM -f /Path/to/key.pem
+eval "$(ssh-agent -s)" # used to start the SSH agent in Unix-like operating systems
+ssh-keygen -p -m PEM -f /Path/to/key.pem # -p= used to change the passphrase of an existing private key, -m= used to specify the format for the key file(-m PEM to ensure the key is in PEM format), -f=file name of the key file you want to operate on.
 export ANSIBLE_HOST_KEY_CHECKING=False
 ansible all -m ping --private-key=/Path/to/key.pem
 ===============================================
