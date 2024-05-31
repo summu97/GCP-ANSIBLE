@@ -10,7 +10,7 @@ Paste private key content in key.pem
 chmod 600 key.pem
 
 
-* Run following commands:
+* Run following commands to install ansible:
 sudo apt-get update
 sudo apt-get install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
