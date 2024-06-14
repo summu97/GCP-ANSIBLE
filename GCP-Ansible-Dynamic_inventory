@@ -1,0 +1,65 @@
+# Install google-auth module using pip
+sudo apt install python3-pip -y 
+sudo pip3 install requests google-auth
+
+# Create a dedicated inventory directory
+sudo mkdir -p /opt/ansible/inventory
+
+# Adding service-account json
+vim /opt/ansible/inventory/service-account.json (put service account json key here)
+
+# Update ansible.cfg file
+vim /etc/ansible/ansible.cfg
+
+[defaults]
+# Inventory file path
+inventory      = /opt/ansible/inventory/gcp.yaml
+
+remote_user = root
+host_key_checking = False
+private_key_file = /root/.ssh/id_rsa
+=======================
+# Update inventory
+vim /opt/ansible/inventory/gcp.yaml
+=======================
+
+---
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /opt/ansible/inventory/service-account.json
+groups:
+  jenkins: "'jenkins' in name"
+  desktop: "'desktop' in name"
+  tomcat: "'tomcat' in name"
+=======================
+
+# Change permissions
+sudo chmod -R 755 /opt/ansible
+cd /opt/ansible/inventory
+ansible-inventory --list -i gcp.yaml
+============
+confirmation: ansible-inventory --list
+vim /opt/ansible/inventory/gcp.yaml
+============
+---
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /opt/ansible/inventory/service-account.json
+groups:
+  jenkins: "'jenkins' in name"
+  desktop: "'desktop' in name"
+  tomcat: "'tomcat' in name"
+============
+ansible-inventory --graph
+============================
+Check connectivity:
+ansible desktop -m ping
+ansible tomcat -m ping
+ansible jenkins -m ping
+=========
+ADHOC command:
+ansible desktop -m shell -a 'echo "Hello World"'
