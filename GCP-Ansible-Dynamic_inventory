@@ -1,3 +1,5 @@
+Reference: https://devopscube.com/ansible-dymanic-inventry-google-cloud/
+
 # Install google-auth module using pip
 sudo apt install python3-pip -y 
 sudo pip3 install requests google-auth
