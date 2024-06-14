@@ -1,0 +1,172 @@
+==========================
+
+									: ROLES :
+mkdir -p roles/desktop/tasks
+vim roles/desktop/tasks/main.yml
+
+---
+- name: Print one
+  command: touch "one"
+  when: operation == 'apply'
+  notify:
+    - Print two
+    - Print three
+
+- name: Print four
+  command: touch "four"
+  when: operation == 'destroy'
+  notify:
+    - Print five
+    - Print six
+
+mkdir -p roles/desktop/handlers
+vim roles/desktop/handlers/main.yml
+
+---
+- name: Print two
+  command: touch "two"
+
+- name: Print three
+  command: touch "three"
+
+- name: Print five
+  command: touch "five"
+
+- name: Print six
+  command: touch "six"
+
+----------------
+vim master.yml
+----------------
+---
+- hosts: "{{ target_hosts }}"
+  become: true
+  roles:
+    - desktop
+
+ansible-playbook -i /opt/ansible/inventory/gcp.yaml -e "target_hosts=desktop" -e "operation=apply" master.yml
+ansible-playbook -e "target_hosts=desktop" -e "operation=apply" master.yml
+=========
+pipeline {
+    agent any
+    
+    environment {
+        CREDENTIALS_ID = 'your-credentials-id'  // Replace with your actual Jenkins credential ID
+    }
+    
+    stages {
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    // Retrieve the service account JSON key from Jenkins credentials
+                    withCredentials([file(credentialsId: CREDENTIALS_ID, variable: 'SERVICE_ACCOUNT_KEY')]) {
+                        sh "echo '$SERVICE_ACCOUNT_KEY' > /opt/ansible/inventory/service-account.json"
+                    }
+                }
+            }
+        }
+        
+        stage('Run Ansible') {
+            steps {
+                sh 'ansible-playbook -i /opt/ansible/inventory/ansible.yml playbook.yml'
+            }
+        }
+    }
+}
+
+=========
+Reference:
+=========
+Sample Playbook:
+vim playbook.yml
+===========
+- hosts: "{{ target_hosts }}"
+  become: true
+  tasks:
+    - name: Print debug information
+      debug:
+        var: inventory_hostname
+
+    - name: Print one
+      command: touch "one"
+      when: "'desktop' in group_names"
+      notify: 
+        - Print two
+        - Print three
+
+    - name: Print four
+      command: touch "four"
+      when: "'tomcat' in group_names"
+      notify: 
+        - Print five
+        - Print six
+
+  handlers:
+    - name: Print two
+      command: touch "two"
+
+    - name: Print three
+      command: touch "three"
+
+    - name: Print five
+      command: touch "five"
+
+    - name: Print six
+      command: touch "six"
+===========
+ansible-playbook -e "target_hosts=desktop" playbook.yml
+===========
+ansible-playbook -e "target_hosts=${TARGET_HOSTS} role=${ROLE}" /path/to/master.yml
+===========
+Reference:
+=====================
+---
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /opt/ansible/inventory/service-account.json
+keyed_groups:
+  - key: labels
+    prefix: label
+  - key: zone
+    prefix: zone
+groups:
+  development: "'env' in (labels|list)"
+  staging: "'jenkins' in name"
+=====================
+Reference:
+
+- hosts: "{{ target_hosts }}"
+  become: true
+  tasks:
+    - name: Print debug information
+      debug:
+        var: inventory_hostname
+
+    - name: Print one
+      command: touch "one"
+      when: operation == 'apply'
+      notify:
+        - Print two
+        - Print three
+
+    - name: Print four
+      command: touch "four"
+      when: operation == 'destroy'
+      notify:
+        - Print five
+        - Print six
+
+  handlers:
+    - name: Print two
+      command: touch "two"
+
+    - name: Print three
+      command: touch "three"
+
+    - name: Print five
+      command: touch "five"
+
+    - name: Print six
+      command: touch "six"
