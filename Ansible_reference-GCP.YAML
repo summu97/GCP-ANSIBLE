@@ -47,3 +47,21 @@ hostnames:
 groups:
   tomcat: "'tomcat' in labels"
   adq-ubuntudesktop: "'adq-ubuntudesktop' in labels"
+========================================
+main.yaml 
+---
+- name: Apply configurations based on group_vars
+  hosts: "{{ ANSIBLE_HOST }}"
+  vars_files:
+    - ./environments/dev/groups/{{ ANSIBLE_PLAYBOOK }}
+
+  tasks:
+    - name: Apply roles in a loop
+      include_role:
+        name: "{{ item.role_name }}"
+      loop: "{{ roles_to_apply }}"
+root@ansible:~/ansible# cat environments/dev/groups/python.yaml 
+ANSIBLE_HOST: adq_ubuntudesktop
+roles_to_apply:
+  - role_name: python
+  - role_name: java
