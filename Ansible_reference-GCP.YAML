@@ -1,0 +1,11 @@
+---
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /root/ansible/service-account.json
+groups:
+  tomcat: "'tomcat' in (labels|list)"
+  adq-ubuntudesktop: "'adq-ubuntudesktop' in (labels|list)"
+hostnames:
+  - private_ip
