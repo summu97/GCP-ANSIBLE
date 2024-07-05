@@ -9,3 +9,41 @@ groups:
   adq-ubuntudesktop: "'adq-ubuntudesktop' in (labels|list)"
 hostnames:
   - private_ip
+=====
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /root/ansible/service-account.json
+filters:
+  - labels.dev=env
+  - labels.adq-ubuntudesktop=app
+hostnames:
+  - private_ip
+groups:
+  adq-ubuntudesktop: "'adq-ubuntudesktop' in labels"
+=====
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /root/ansible/service-account.json
+filters:
+  - labels.dev=env
+hostnames:
+  - private_ip
+groups:
+  tomcat: "'tomcat' in labels"
+=====
+plugin: gcp_compute
+projects:
+  - sumanth-97
+auth_kind: serviceaccount
+service_account_file: /root/ansible/service-account.json
+filters:
+  - labels.dev=env
+hostnames:
+  - private_ip
+groups:
+  tomcat: "'tomcat' in labels"
+  adq-ubuntudesktop: "'adq-ubuntudesktop' in labels"
